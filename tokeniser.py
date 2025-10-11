@@ -3,6 +3,16 @@ from typing import Tuple
 
 special_tkns = [ "=", "+", "-", "*", "/", "%", "==", "!=", ">", ">=", "<", "<=", "=~", "!~", "==?", "==#", "..", "." ]
 bracket_pair_tkns = { '{' : '}', '(' : ')', '[' : ']', "'" : "'", '"' : '"' }
+keyword_tkns = [ "if", "elseif", "else", "endif",
+                "while", "endwhile",
+                "for", "in", "endfor",
+                "try", "catch", "finally", "endtry",
+                "function", "return", "endfunction",
+                "range", "dict",
+                "call", "execute", "normal",
+                "let", "unlet", "delfunction",
+                "break", "continue",
+                "else", "elseif"]
 # note to self - ignore this: 1.2e-3
 
 def is_special_tkn(line : str, target_char : int) -> Tuple[bool, str]:

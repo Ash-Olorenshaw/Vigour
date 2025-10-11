@@ -1,5 +1,6 @@
 
-from typing import Any, Tuple
+from typing import Tuple
+from vars import Variable
 
-
-scopes : list[Tuple[dict[str, Any], int]] = [] # (vars are these - s:, a:)
+# structure : [ ( { foo: 0 }, 19 ) ]
+scopes : list[Tuple[dict[str, Variable], int]] = [] # (vars are these - s:, a:, None)
