@@ -6,9 +6,9 @@
 #define ARENA_MAX_SIZE 1024
 
 #define ARENA_INIT(target_arena) ({ \
-		memset(target_arena->arena, 0, MAX_ARENA_SIZE); \
+		memset(target_arena->arena, 0, ARENA_MAX_SIZE); \
 		target_arena->size = 0; \
-		target_arena->max_size = MAX_ARENA_SIZE; \
+		target_arena->max_size = ARENA_MAX_SIZE; \
 	})
 
 typedef char vim_byte;
