@@ -33,7 +33,7 @@ contains
         end do
     end subroutine
 
-    function is_whitespace(str) result(res)
+    pure function is_whitespace(str) result(res)
         use stdlib_ascii, only: is_white
         character(*), intent(in) :: str
         logical :: res
@@ -48,14 +48,13 @@ contains
     pure function str_contains(str, char) result(res)
         character(*), intent(in) :: str
         character, intent(in) :: char
-        logical :: res
-        integer :: i
+        integer :: i, res
 
-        res = .false.
+        res = 0
 
         do i = 1, len(str)
             if (str(i:i) == char) &
-                res = .true.
+                res = res + 1
         end do
     end function
 end module

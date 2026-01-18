@@ -35,10 +35,12 @@ contains
         tkns%size = 0
         new_tkn = .true.
 
-        ! temp vv
+        ! temp code vv
         allocate(tkns%arr(128))
         tkns%size = 128
-        ! temp ^^
+        ! temp code ^^
+
+        ! TODO - test for string concat with '.'
 
         do while(i <= len(line))
             c = line(i:i)
@@ -59,7 +61,6 @@ contains
                 end if
             else if (i == len(line)) then
                 new_tkn = .true.
-                ! print *, "END: ", line(start:i), start, i
             else
                 new_tkn = .false.
             end if
@@ -93,14 +94,12 @@ contains
                 cycle
             end if
 
-            ! print *, "BTM: ", line(start:i)
-
             if (is_special(line, i, new_i)) then
                 call tkns%add(OPERATOR, line(i:new_i))
                 i = new_i
                 start = i + 1
             else if (new_tkn .and. is_number(line(start:i))) then
-                if (str_contains(line(start:i), '.')) then
+                if (str_contains(line(start:i), '.') > 0) then
                     call tkns%add(FLOATVAL, line(start:i))
                 else
                     call tkns%add(INTVAL, line(start:i))
