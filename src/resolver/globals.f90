@@ -75,12 +75,12 @@ contains
                     if (VARS(i)%scope == scope) then
                         exists = .true.
                         return
-                    else
-                        call raise_err("Err - named variable exists in different scope.")
+                    ! else
+                    !     call raise_err("Err - named variable exists in different scope.")
                     end if
                 end if
             end do
-            call raise_err("Err - variable does not exist.")
+            ! call raise_err("Err - variable does not exist.")
         end if
     end function
 end module

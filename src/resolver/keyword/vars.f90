@@ -12,21 +12,33 @@ module resolver_keyword_vars
 contains
     subroutine define_var(tkns)
         type(tkn_line), intent(in) :: tkns
-        character(:), allocatable :: var_name
+        type(tkn_line) :: resolved_tkns
+        character(:), allocatable :: var_name, var_val
         logical :: s
-        integer :: scope
+        integer :: scope, i
 
         if (tkns%arr(2)%t == IDENTIFIER) then
             if (tkns%arr(3)%t == OPERATOR .and. tkns%arr(3)%val == "=") then
-                ! TODO - use 'resolve_token_lines'
+                resolved_tkns = resolve_tkn_line(tkns, 3)
+                if (resolved_tkns%current == 2) then
+                    if (resolved_tkns%arr(1)%internal) then
+                        var_val = resolved_tkns%arr(1)%val
+                    else
+                        var_val = resolved_tkns%arr(1)%to_str()
+                    end if
+                else 
+                    do i = 1, resolved_tkns%current
+                        print *, resolved_tkns%arr(i)%val
+                    end do
+                    call raise_err("Passed too many/too little values to var assignment statement")
+                end if
+
                 var_name = get_var_name(tkns%arr(2)%val, scope=scope)
+
                 if (var_exists(tkns%arr(2)%val, scope)) then
-                    ! s = write_to_main(var_name//"=(vim_var)"//tkns%arr(4)%to_str()//";")
-                    s = write_to_main(var_name//"="//resolve_tkn_line(tkns, 3)//";")
+                    s = write_to_main(var_name//"="//var_val//";")
                 else
-                    ! s = write_to_main("vim_var "//var_name//"="//tkns%arr(4)%to_str()//";")
-                    ! s = write_to_main("vim_var "//var_name//"="//tkns%arr(4)%to_str()//";")
-                    s = write_to_main("vim_var "//var_name//"="//resolve_tkn_line(tkns, 3)//";")
+                    s = write_to_main("vim_var "//var_name//"="//var_val//";")
                     call save_var(var(tkns%arr(4)%t, tkns%arr(2)%val, scope))
                 end if
             end if

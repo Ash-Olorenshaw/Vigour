@@ -24,6 +24,7 @@ module tokeniser_types
         integer :: t = -1
         logical :: internal = .false.
         character(:), allocatable :: val
+        integer :: line, col
     contains
         procedure :: to_str => tkn_to_str
     end type
