@@ -4,7 +4,7 @@ module resolver_identifier
         IDENTIFIER, FUNCTIONCALL, KEYWORD
     use utils_core, only: raise_err
     use resolver_expressions, only: resolve_tkn_line
-    use writer, only: write_to_main
+    use writer, only: write_str
     use resolver_globals, only: var_exists, CURRENT_SCOPE, get_var_name
     implicit none
 contains
@@ -20,7 +20,7 @@ contains
             case("echom")
                 resolved_tkns = resolve_tkn_line(tkns, 1)
                 call echo(resolved_tkns)
-                s = write_to_main("printf(""\n"");")
+                s = write_str("printf(""\n"");")
         end select
     end subroutine
 
@@ -44,6 +44,6 @@ contains
                 exec_str = exec_str//","//tkns%arr(i)%to_str()
             end if
         end do 
-        s = write_to_main("vim_print("//to_string(tkns%current - 1)//", "//exec_str//");")
+        s = write_str("vim_print("//to_string(tkns%current - 1)//", "//exec_str//");")
     end subroutine
 end module

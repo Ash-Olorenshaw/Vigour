@@ -2,14 +2,20 @@ module writer
     implicit none
     private
 
-    public :: setup, write_str, write_to_main, write_to_line
+    public :: setup, write_str, write_to_line, exit_scope, enter_scope, current_scope_pos
+
     character(*), parameter, public :: PROG_FILE = "VIMBUILD/program.c"
+    integer :: scopes(100)
+    integer :: current_scope = 0
+
+    integer :: global_var_pos = 4
+    integer :: current_func_var_pos = -1
 contains
     subroutine setup()
         use stdlib_ascii, only: LF
         logical :: s
         integer :: io
-        s = write_str( "&
+        s = write_contents( "&
             &#include <stdio.h>"//LF//"&
             &#include ""./lib/io.h"""//LF//"&
             &#include ""./lib/internal.h"""//LF//"&
@@ -18,9 +24,35 @@ contains
             &return 0;"//LF//"&
             &}" &
         )
+        call enter_scope(5)
     end subroutine
 
-    function write_str(str) result(success)
+    subroutine exit_scope()
+        use utils_core, only: raise_err
+        if (current_scope > 1) then
+            current_scope = current_scope - 1
+        else 
+            call raise_err("Err - Failed to exit scope, already at a toplevel scope")
+        end if
+    end subroutine
+
+    subroutine enter_scope(val)
+        use utils_core, only: raise_err
+        integer, intent(in) :: val
+        if (current_scope < 100) then 
+            current_scope = current_scope + 1
+            scopes(current_scope) = val
+        else 
+            call raise_err("Err - Attempted to enter a scope beyone max depth of 100.")
+        end if
+    end subroutine
+
+    function current_scope_pos() result(res)
+        integer :: res
+        res = scopes(current_scope) 
+    end function
+    
+    function write_contents(str) result(success)
         character(*), intent(in) :: str
         integer :: io
         logical :: success
@@ -30,18 +62,20 @@ contains
         success = .true.
     end function
     
-    function write_to_main(str) result(success)
+    function write_str(str) result(success)
         use utils_strings, only: str_contains
         use stdlib_ascii, only: LF
 
         character(*), intent(in) :: str
         logical :: success
-        integer :: pos = 5
-        integer :: newlines
+        integer :: newlines, i
 
-        success = write_to_line(pos, str)
+        success = write_to_line(scopes(current_scope), str)
         newlines = str_contains(str, LF)
-        pos = pos + newlines + 1
+
+        do i = 1, current_scope
+            scopes(i) = scopes(i) + newlines + 1
+        end do
     end function
 
     function write_to_line(insert_after, str) result(success)

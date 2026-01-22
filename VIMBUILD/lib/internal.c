@@ -27,3 +27,27 @@ void arena_free(arena *target_arena) {
 	target_arena->size = 0;
 }
 
+int vim_if(vim_var var) {
+	if (var.type == Number) {
+		return var.val.Number;
+	}
+	else if (var.type == Float) {
+		return var.val.Float;
+	}
+	else if (var.type == String) {
+		// TODO
+	}
+	else if (var.type == Funcref) {
+		// TODO
+	}
+	else if (var.type == List) {
+		// TODO
+	}
+	else if (var.type == Dictionary) {
+		// TODO
+	}
+	else if (var.type == Blob) {
+		// TODO
+	}
+	return 0;
+}

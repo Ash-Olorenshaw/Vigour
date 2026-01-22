@@ -48,5 +48,6 @@ typedef struct {
 
 void *arena_reserve(arena *target_arena, int space_size);
 void arena_free(arena *target_arena);
+int vim_if(vim_var var);
 
 #endif
