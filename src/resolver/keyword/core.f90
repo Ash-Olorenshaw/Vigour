@@ -7,7 +7,7 @@ contains
         use tokeniser_types, only: t_to_str
         use stdlib_strings, only: to_string
         use resolver_expressions, only: resolve_tkn_line
-        use writer, only: current_scope_pos, enter_scope, write_str, exit_scope
+        use writer, only: write_str
         type(tkn_line), intent(in) :: tkns
         character(:), allocatable :: resolved_line
         type(tkn_line) :: resolved_tkns
@@ -28,10 +28,7 @@ contains
                     end if
                 end do 
                 s = write_str("if (vim_if("//resolved_line//")) {")
-                call enter_scope(current_scope_pos())
-                ! TODO
             case("endif")
-                call exit_scope()
                 s = write_str("}")
         end select
     end subroutine
