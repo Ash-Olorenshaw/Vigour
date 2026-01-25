@@ -5,8 +5,7 @@ module writer
     public :: setup, write_str, write_to_line
 
     character(*), parameter, public :: PROG_FILE = "VIMBUILD/program.c"
-    integer :: main_pos
-
+    integer :: main_pos = 0
     integer :: global_var_pos = 4
     integer :: current_func_var_pos = -1
 contains

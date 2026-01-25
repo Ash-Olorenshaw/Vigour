@@ -1,4 +1,5 @@
 module resolver_globals
+    use utils_core, only: raise_warn
     implicit none
     private
     
@@ -19,13 +20,36 @@ module resolver_globals
     integer, parameter, public :: SCOPE_FUNC = 3 ! a:, l:
     integer, public :: CURRENT_SCOPE = SCOPE_LOCAL
 
-    public :: save_var, var_exists, get_var_name, var
+    public :: save_var, var_exists, get_var_name, get_var_type, var
 contains
     subroutine save_var(tosave)
         type(var), intent(in) :: tosave
         VARS_SIZE = VARS_SIZE + 1
         VARS(VARS_SIZE) = tosave
     end subroutine
+
+    function get_var_type(name, scope) result(var_type)
+        character(*), intent(in) :: name
+        integer, intent(in) :: scope
+        integer :: i, var_type
+
+        var_type = -1
+
+        if (VARS_SIZE > 0) then
+            do i = 1, VARS_SIZE
+                print *, "    TESTING: ", VARS(i)%name, " AGAINST: ", name
+                if (VARS(i)%name == name) then
+                    if (VARS(i)%scope == scope) then
+                        var_type = VARS(i)%t
+                        return
+                    else
+                        call raise_warn("Named variable exists in different scope.")
+                    end if
+                end if
+            end do
+            call raise_warn("Variable does not exist: '"//name//"'")
+        end if
+    end function
 
     function get_var_name(name, scope) result(var_name)
         use stdlib_strings, only: starts_with
@@ -68,15 +92,12 @@ contains
 
         if (VARS_SIZE > 0) then
             do i = 1, VARS_SIZE
-                ! print *, VARS(i)%t
-                ! print *, VARS(i)%name//"  "//name
-                ! print *, VARS(i)%scope
                 if (VARS(i)%name == name) then
                     if (VARS(i)%scope == scope) then
                         exists = .true.
                         return
                     ! else
-                    !     call raise_err("Err - named variable exists in different scope.")
+                    !     call raise_warn("Err - named variable exists in different scope.")
                     end if
                 end if
             end do

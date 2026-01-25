@@ -6,13 +6,14 @@ module utils_core
 contains
     subroutine raise_err(err)
         character(*), intent(in) :: err
-        print *, err
+        print *, "ERR - "//err
+        print *, "STOP"
         stop 1
     end subroutine
 
     subroutine raise_warn(warn)
         character(*), intent(in) :: warn
-        print *, warn
+        print *, "WARN - "//warn
     end subroutine
 end module
 

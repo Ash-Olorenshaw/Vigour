@@ -39,7 +39,7 @@ contains
                     s = write_str(var_name//"="//var_val//";")
                 else
                     s = write_str("vim_var "//var_name//"="//var_val//";")
-                    call save_var(var(tkns%arr(4)%t, tkns%arr(2)%val, scope))
+                    call save_var(var(tkns%arr(4)%t, var_name, scope))
                 end if
             end if
         end if
