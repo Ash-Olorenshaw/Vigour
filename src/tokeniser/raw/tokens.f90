@@ -11,7 +11,11 @@ contains
         integer :: tkn
         logical :: res
         character(:), allocatable :: stripped_tkn, comp_str
-        character(3), dimension(19) :: special_tkns = [ "=  ", "+  ", "-  ", "*  ", "/  ", "%  ", "== ", "!= ", ">  ", ">= ", "<  ", "<= ", "==?", "==#", "!=?", "!=#" ,".. ", "!  ", "?  " ]
+        character(6), dimension(39) :: special_tkns = [ "==?   ", "==#   ", "==    ", "!=?   ", "!=#   ", "!=    ", ">=?   ", ">=#   ", ">=    ", & 
+            "<=    ", "<=?   ", "<=#   ", "..    ", ">?    ", ">#    ", ">     ", "<?    ", "<#    ", "<     ", "=~?   ", "=~#   ", "=~    ", & 
+            "!~?   ", "!~#   ", "!~    ", "is?   ", "is#   ", "is    ", "isnot?", "isnot#", "isnot ", "=     ", "+     ", "-     ", "*     ", & 
+            "/     ", "%     ",  "!     ", "?     " &
+        ]
 
         res = .false.
 

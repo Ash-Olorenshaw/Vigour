@@ -3,7 +3,7 @@ module build_sys
     implicit none
     private
 
-    character(*), parameter, private :: lib_files = " ./VIMBUILD/lib/io.c ./VIMBUILD/lib/internal.c ./VIMBUILD/lib/maths/basic.c"
+    character(*), parameter, private :: lib_files = " ./VIMBUILD/lib/io.c ./VIMBUILD/lib/equality.c ./VIMBUILD/lib/internal.c ./VIMBUILD/lib/maths/basic.c"
     public :: compile, run
 contains
     function compile() result(success)

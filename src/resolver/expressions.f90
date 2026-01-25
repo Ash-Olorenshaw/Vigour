@@ -91,7 +91,7 @@ contains
         print *, "RESOLVING TKN VAL..."
 
         if (tgt_tkn%t == OPERATOR .or. tgt_tkn%t == KEYWORD) then
-            call raise_err("Orphaned operator.")
+            call raise_err("Orphaned operator: '"//tgt_tkn%val//"'")
         else if (tgt_tkn%internal) then
             print *, "INTERNAL: ", tgt_tkn%val
             val = tgt_tkn%val
@@ -190,7 +190,14 @@ contains
                                     else if (lvl == 4) then
                                         print *, "LVL 4: ", last_tkns%arr(pos)%val//" "//t_to_str(prev_tkn%t)//" "//t_to_str(next_tkn%t)
                                         if (last_tkns%arr(pos)%val == "==") then
-                                            call new_tkns%add(prev_tkn%t, "vim_eq("//item1//","//item2//")")
+                                            call new_tkns%add(prev_tkn%t, "vim_eq("//item1//","//item2//",CASE_SENSITIVE)")
+                                            new_tkns%arr(new_tkns%current-1)%internal = .true.
+                                            call consume_group(consumed, next_consumed, pos-1, pos, pos+1)
+                                            print *, "ADDING: ", new_tkns%arr(new_tkns%current-1)%val
+                                            ops = ops + 1
+                                            pos = pos + 1
+                                        else if (last_tkns%arr(pos)%val == "!=") then
+                                            call new_tkns%add(prev_tkn%t, "vim_ne("//item1//","//item2//",CASE_SENSITIVE)")
                                             new_tkns%arr(new_tkns%current-1)%internal = .true.
                                             call consume_group(consumed, next_consumed, pos-1, pos, pos+1)
                                             print *, "ADDING: ", new_tkns%arr(new_tkns%current-1)%val
@@ -199,28 +206,28 @@ contains
                                         else if (identifier_matches(prev_tkn, next_tkn, [FLOATVAL, STRINGVAL, INTVAL])) then
                                             print *, "int vs int (float or string)"
                                             if (last_tkns%arr(pos)%val == "<") then
-                                                call new_tkns%add(prev_tkn%t, "vim_lt("//item1//","//item2//")")
+                                                call new_tkns%add(prev_tkn%t, "vim_lt("//item1//","//item2//",CASE_SENSITIVE)")
                                                 new_tkns%arr(new_tkns%current-1)%internal = .true.
                                                 call consume_group(consumed, next_consumed, pos-1, pos, pos+1)
                                                 print *, "ADDING: ", new_tkns%arr(new_tkns%current-1)%val
                                                 ops = ops + 1
                                                 pos = pos + 1
                                             else if (last_tkns%arr(pos)%val == ">") then
-                                                call new_tkns%add(prev_tkn%t, "vim_gt("//item1//","//item2//")")
+                                                call new_tkns%add(prev_tkn%t, "vim_gt("//item1//","//item2//",CASE_SENSITIVE)")
                                                 new_tkns%arr(new_tkns%current-1)%internal = .true.
                                                 call consume_group(consumed, next_consumed, pos-1, pos, pos+1)
                                                 print *, "ADDING: ", new_tkns%arr(new_tkns%current-1)%val
                                                 ops = ops + 1
                                                 pos = pos + 1
                                             else if (last_tkns%arr(pos)%val == ">=") then
-                                                call new_tkns%add(prev_tkn%t, "vim_ge("//item1//","//item2//")")
+                                                call new_tkns%add(prev_tkn%t, "vim_ge("//item1//","//item2//",CASE_SENSITIVE)")
                                                 new_tkns%arr(new_tkns%current-1)%internal = .true.
                                                 call consume_group(consumed, next_consumed, pos-1, pos, pos+1)
                                                 print *, "ADDING: ", new_tkns%arr(new_tkns%current-1)%val
                                                 ops = ops + 1
                                                 pos = pos + 1
                                             else if (last_tkns%arr(pos)%val == "<=") then
-                                                call new_tkns%add(prev_tkn%t, "vim_le("//item1//","//item2//")")
+                                                call new_tkns%add(prev_tkn%t, "vim_le("//item1//","//item2//",CASE_SENSITIVE)")
                                                 new_tkns%arr(new_tkns%current-1)%internal = .true.
                                                 call consume_group(consumed, next_consumed, pos-1, pos, pos+1)
                                                 print *, "ADDING: ", new_tkns%arr(new_tkns%current-1)%val

@@ -6,7 +6,7 @@ module writer
 
     character(*), parameter, public :: PROG_FILE = "VIMBUILD/program.c"
     integer :: main_pos = 0
-    integer :: global_var_pos = 4
+    integer :: global_var_pos = 5
     integer :: current_func_var_pos = -1
 contains
     subroutine setup()
@@ -17,12 +17,13 @@ contains
             &#include <stdio.h>"//LF//"&
             &#include ""./lib/io.h"""//LF//"&
             &#include ""./lib/internal.h"""//LF//"&
+            &#include ""./lib/equality.h"""//LF//"&
             &#include ""./lib/maths/basic.h"""//LF//"&
             &int main(int argc, char *argv[]) {"//LF//"&
             &return 0;"//LF//"&
             &}" &
         )
-        main_pos = 5
+        main_pos = 6
     end subroutine
     
     function write_contents(str) result(success)

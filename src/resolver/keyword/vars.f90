@@ -30,12 +30,12 @@ contains
                     do i = 1, resolved_tkns%current
                         print *, resolved_tkns%arr(i)%val
                     end do
-                    call raise_err("Passed too many/too little values to var assignment statement")
+                    call raise_err("Passed too many values into var assignment statement")
                 end if
 
                 var_name = get_var_name(tkns%arr(2)%val, scope=scope)
 
-                if (var_exists(tkns%arr(2)%val, scope)) then
+                if (var_exists(var_name, scope)) then
                     s = write_str(var_name//"="//var_val//";")
                 else
                     s = write_str("vim_var "//var_name//"="//var_val//";")

@@ -1,12 +1,32 @@
 let foo = 1 + 2 * 3 * 5
-let bar = 1
 echom foo
 
-if bar > 0
-	echo 12345
-	echo 12345
-	echo 12345
-	echom 12345
+let bar = 1
+
+if bar > 1
+	echo 222222
+elseif bar == 1
+	echo 101010
+else
+	echo 100100
+endif
+let bar = 0
+
+if bar > 1
+	echo 222222
+elseif bar == 1
+	echo 101010
+else
+	echo 100100
+endif
+let bar = 5
+
+if bar > 1
+	echo 222222
+elseif bar == 1
+	echo 101010
+else
+	echo 100100
 endif
 
 echo 1 + 1

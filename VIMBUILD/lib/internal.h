@@ -4,7 +4,12 @@
 #include <stdint.h>
 
 #define ARENA_MAX_SIZE 1024
-#define ARENA_INIT(target_arena)
+#define ARENA_INIT(target_arena) ({ \
+		target_arena->size = 0; \
+		target_arena->max_size = ARENA_MAX_SIZE; \
+		target_arena->arena = {0}; \
+	})
+
 typedef char vim_byte;
 typedef double float64;
 typedef int64_t int64;
@@ -38,8 +43,11 @@ typedef struct {
 	vim_var val;
 } vim_dict_item;
 
+#define CREATE_SIMPLE_VIM_VAR(var_val, var_type) ((vim_var) {.val.var_type = var_val, .type = var_type })
+
 typedef vim_dict_item *vim_dict;
 typedef vim_var *vim_list; // not a real list because we aren't dumb!!
+int vim_if(vim_var var);
 
 typedef struct {
 	void *arena[ARENA_MAX_SIZE];
@@ -48,6 +56,5 @@ typedef struct {
 
 void *arena_reserve(arena *target_arena, int space_size);
 void arena_free(arena *target_arena);
-int vim_if(vim_var var);
 
 #endif
