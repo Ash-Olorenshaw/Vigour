@@ -41,6 +41,7 @@ contains
         ! temp code ^^
 
         ! TODO - test for string concat with '.'
+        ! TODO - '+2', '-2' becomes '2', '-2', etc
 
         do while(i <= len(line))
             c = line(i:i)

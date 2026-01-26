@@ -33,7 +33,7 @@ contains
             if (c == LF .or. c == '|' .and. inside_string == ' ') then
                 if (i == len(text)) then
                     if (text(i-1:i-1) /= '\') then
-                        ! TODO - separate out into func
+                        ! TODO - separate out duplicated code
                         stripped_line = strip(text(str_s:i-1))
                         if (.not. is_whitespace(stripped_line)) then
                             lines%arr(lines_count)%val = stripped_line
