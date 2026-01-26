@@ -3,7 +3,7 @@ module resolver_keyword_vars
         INTVAL, STRINGVAL, FLOATVAL, LISTVAL, DICTVAL, OPERATOR, &
         IDENTIFIER, FUNCTIONCALL, KEYWORD
     use utils_core, only: raise_err
-    use writer, only: write_str
+    use writer, only: write_str, write_var
     use resolver_globals, only: var_exists, CURRENT_SCOPE, get_var_name, save_var, var
     use resolver_expressions, only: resolve_tkn_line
     implicit none
@@ -35,12 +35,12 @@ contains
 
                 var_name = get_var_name(tkns%arr(2)%val, scope=scope)
 
-                if (var_exists(var_name, scope)) then
-                    s = write_str(var_name//"="//var_val//";")
-                else
-                    s = write_str("vim_var "//var_name//"="//var_val//";")
+                if (.not. var_exists(var_name, scope)) then
+                    ! s = write_str("vim_var "//var_name//"="//var_val//";")
+                    s = write_var(var_name)
                     call save_var(var(tkns%arr(4)%t, var_name, scope))
                 end if
+                s = write_str(var_name//"="//var_val//";")
             end if
         end if
     end subroutine

@@ -2,7 +2,7 @@ module writer
     implicit none
     private
 
-    public :: setup, write_str, write_to_line
+    public :: setup, write_str, write_var, write_to_line
 
     character(*), parameter, public :: PROG_FILE = "VIMBUILD/program.c"
     integer :: main_pos = 0
@@ -34,6 +34,19 @@ contains
         write(io, *) str
         close(io)
         success = .true.
+    end function
+
+    function write_var(var_name) result(success)
+        use utils_strings, only: str_contains
+        use stdlib_ascii, only: LF
+
+        character(*), intent(in) :: var_name
+        logical :: success
+        integer :: newlines, i
+
+        success = write_to_line(global_var_pos, "vim_var "//var_name//";")
+        main_pos = main_pos + 1
+        global_var_pos = global_var_pos + 1
     end function
     
     function write_str(str) result(success)
