@@ -9,6 +9,6 @@ The only vimtypes supported are `Number` and `Float`
 
 Todo: 
 
-- [ ] Fix currently broken equality testing funcs
-- [ ] Update `resolve_tkn_line` in `resolver_expressions` to not be a monstrous, unwieldy and likely very broken function
-- [ ] Change equality funcs to be macos??
+- [*] Fix currently broken equality testing funcs
+- [*] Update `resolve_tkn_line` in `resolver_expressions` to not be a monstrous, unwieldy and likely very broken function
+- [*] Change equality funcs to be macos??

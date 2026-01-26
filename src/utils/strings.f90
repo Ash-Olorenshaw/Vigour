@@ -1,7 +1,7 @@
 module utils_strings
     implicit none
     private
-    public :: is_whitespace, skip_whitespace, skip_to_whitespace, str_contains
+    public :: is_whitespace, skip_whitespace, skip_to_whitespace, str_contains, replace_all_occurences
 contains
     subroutine skip_whitespace(str, pos)
         use utils_core, only: raise_err
@@ -55,6 +55,31 @@ contains
         do i = 1, len(str)
             if (str(i:i) == char) &
                 res = res + 1
+        end do
+    end function
+
+    function replace_all_occurences(str, char, replace) result(new_str)
+        character(*), intent(in) :: str, replace
+        character, intent(in) :: char
+        character(:), allocatable :: new_str
+        integer :: i, j, c, occurences
+
+        occurences = str_contains(str, char)
+        allocate(character(len(str) + occurences) :: new_str)
+
+        i = 1
+        j = 1
+        do while(i <= len(str))
+            if (str(i:i) == char) then
+                do c = 1, len(replace)
+                    new_str(j+c-1:j+c-1) = char
+                end do
+                j = j + len(replace) - 1
+            else
+                new_str(j:j) = str(i:i)
+            end if
+            i = i + 1
+            j = j + 1
         end do
     end function
 end module

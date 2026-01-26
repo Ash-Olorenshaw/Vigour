@@ -13,7 +13,7 @@
 typedef char vim_byte;
 typedef double float64;
 typedef int64_t int64;
-typedef char *vim_string;
+typedef char *vim_string; // See 'variable types': "A NUL terminated string of 8-bit unsigned characters (bytes)." 
 
 typedef union {
 	float64 Float;

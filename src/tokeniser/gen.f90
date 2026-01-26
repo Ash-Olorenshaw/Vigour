@@ -22,7 +22,7 @@ contains
 
     subroutine gen_tkns(line, tkns)
         use stdlib_ascii, only: is_white
-        use utils_strings, only: skip_whitespace, skip_to_whitespace, str_contains
+        use utils_strings, only: skip_whitespace, skip_to_whitespace, str_contains, replace_all_occurences
         use tokeniser_raw_tokens, only: is_special, is_valid_var_id, is_number, skip_to_tkn, is_keyword
         character(*), intent(in) :: line
         type(tkn_line), intent(out) :: tkns
@@ -67,11 +67,16 @@ contains
             end if
 
             if (c == '"' .or. c == "'") then
+                ! TODO - implement '' in a ' string to signify single '
                 if (i < len(line)) then
                     i = i + 1
                     start = i
                     call skip_to_tkn(line, i, c, esc=.true.)
-                    call tkns%add(STRINGVAL, line(start:i-1))
+                    if (c == '"') then
+                        call tkns%add(STRINGVAL, line(start - 1:i))
+                    else
+                        call tkns%add(STRINGVAL, '"'//replace_all_occurences(line(start:i-1), "\", "\\")//'"')
+                    end if
                     start = i
                     cycle
                 end if

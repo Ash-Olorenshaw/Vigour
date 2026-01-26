@@ -1,25 +1,15 @@
 let foo = 1 + 2 * 3 * 5
 echom foo
 
-let bar = 1
+let bar = "foo"
 
-if bar > 1
-	echo 222222
-elseif bar == 1
-	echo 101010
-else
-	echo 100100
+if bar == "foo"
+	echom bar
 endif
-let bar = 0
 
-if bar > 1
-	echo 222222
-elseif bar == 1
-	echo 101010
-else
-	echo 100100
+if bar != "bar"
+	echom "HAHA"
 endif
-let bar = 5
 
 if bar > 1
 	echo 222222

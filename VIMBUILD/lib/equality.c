@@ -1,22 +1,34 @@
+#include <string.h>
+#include <stdio.h>
 #include "./internal.h"
 #include "./equality.h"
+#include "./strings/coersion.h"
+#include "./strings/internal.h"
 
 #define COMP_FUNC(__comparator__) \
 	if (elem1.type == Float) { \
-		if (elem2.type == Float) { \
+		if (elem2.type == Float) \
 			return CREATE_SIMPLE_VIM_VAR((elem1.val.Float __comparator__ elem2.val.Float), Number); \
-		} \
-		else if (elem2.type == Number) { \
+		else if (elem2.type == Number) \
 			return CREATE_SIMPLE_VIM_VAR((elem1.val.Float __comparator__ elem2.val.Number), Number); \
-		} \
+		else if (elem2.type == String) \
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number __comparator__ vim_str_to_number(elem2).val.Number), Number); \
 	} \
 	else if (elem1.type == Number) { \
-		if (elem2.type == Float) { \
+		if (elem2.type == Float) \
 			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number __comparator__ elem2.val.Float), Number); \
-		} \
-		else if (elem2.type == Number) { \
+		else if (elem2.type == Number) \
 			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number __comparator__ elem2.val.Number), Number); \
-		} \
+		else if (elem2.type == String) \
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number __comparator__ vim_str_to_number(elem2).val.Number), Number); \
+	} \
+	else if (elem1.type == String) { \
+		if (elem2.type == Float) \
+			return CREATE_SIMPLE_VIM_VAR((vim_str_to_number(elem1).val.Number __comparator__ elem2.val.Float), Number); \
+		else if (elem2.type == Number) \
+			return CREATE_SIMPLE_VIM_VAR((vim_str_to_number(elem1).val.Number __comparator__ elem2.val.Number), Number); \
+		else if (elem2.type == String) \
+			return CREATE_SIMPLE_VIM_VAR((vim_str_to_number(elem1).val.Number __comparator__ vim_str_to_number(elem2).val.Number), Number); \
 	} \
 	else { \
 	} \
@@ -24,11 +36,71 @@
 
 
 vim_var vim_eq(vim_var elem1, vim_var elem2, vim_case_sensitivity mode) {
-	COMP_FUNC(==);
+	if (elem1.type == Float) {
+		if (elem2.type == Float)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Float == elem2.val.Float), Number);
+		else if (elem2.type == Number)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Float == elem2.val.Number), Number);
+		else if (elem2.type == String)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number == vim_str_to_number(elem2).val.Number), Number);
+	}
+	else if (elem1.type == Number) {
+		if (elem2.type == Float)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number == elem2.val.Float), Number);
+		else if (elem2.type == Number)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number == elem2.val.Number), Number);
+		else if (elem2.type == String)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number == vim_str_to_number(elem2).val.Number), Number);
+	}
+	else if (elem1.type == String) {
+		if (elem2.type == Float)
+			return CREATE_SIMPLE_VIM_VAR((vim_str_to_number(elem1).val.Number == elem2.val.Float), Number);
+		else if (elem2.type == Number)
+			return CREATE_SIMPLE_VIM_VAR((vim_str_to_number(elem1).val.Number == elem2.val.Number), Number);
+		else if (elem2.type == String) {
+			if (strlen(elem1.val.String) != strlen(elem2.val.String))
+				return CREATE_SIMPLE_VIM_VAR(0, Number);
+			else
+				return CREATE_SIMPLE_VIM_VAR(vim_strcmp(elem1, elem2, mode), Number);
+		}
+	}
+	else {
+	}
+	return CREATE_SIMPLE_VIM_VAR(0, Number);
 }
 
 vim_var vim_ne(vim_var elem1, vim_var elem2, vim_case_sensitivity mode) {
-	COMP_FUNC(!=);
+	if (elem1.type == Float) {
+		if (elem2.type == Float)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Float != elem2.val.Float), Number);
+		else if (elem2.type == Number)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Float != elem2.val.Number), Number);
+		else if (elem2.type == String)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number != vim_str_to_number(elem2).val.Number), Number);
+	}
+	else if (elem1.type == Number) {
+		if (elem2.type == Float)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number != elem2.val.Float), Number);
+		else if (elem2.type == Number)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number != elem2.val.Number), Number);
+		else if (elem2.type == String)
+			return CREATE_SIMPLE_VIM_VAR((elem1.val.Number != vim_str_to_number(elem2).val.Number), Number);
+	}
+	else if (elem1.type == String) {
+		if (elem2.type == Float)
+			return CREATE_SIMPLE_VIM_VAR((vim_str_to_number(elem1).val.Number != elem2.val.Float), Number);
+		else if (elem2.type == Number)
+			return CREATE_SIMPLE_VIM_VAR((vim_str_to_number(elem1).val.Number != elem2.val.Number), Number);
+		else if (elem2.type == String) {
+			if (strlen(elem1.val.String) != strlen(elem2.val.String))
+				return CREATE_SIMPLE_VIM_VAR(1, Number);
+			else
+				return CREATE_SIMPLE_VIM_VAR(!vim_strcmp(elem1, elem2, mode), Number);
+		}
+	}
+	else {
+	}
+	return CREATE_SIMPLE_VIM_VAR(0, Number);
 }
 
 vim_var vim_gt(vim_var elem1, vim_var elem2, vim_case_sensitivity mode) {
