@@ -57,7 +57,7 @@ contains
             if (var_exists(token%val, scope)) then
                 str = get_var_name(token%val)
             else
-                call raise_err("Err - Attempted to convert identifier to C value '"//token%val//"'")
+                call raise_err("Err - Attempted to convert identifier to C value '"//token%val//"'", token%line, token%col)
             end if
         else
             str = "(vim_var){.val."//to_c_union_elem(token%t)//"="//token%val//","//".type="//to_c_type_str(token%t)//"}"
@@ -82,16 +82,18 @@ contains
         tkns%current = tkns%current - count
     end subroutine
 
-    subroutine add_tkn(tkns, t, val, internal)
+    subroutine add_tkn(tkns, t, val, internal, line, col)
         use utils_core, only: raise_err
         class(tkn_line), intent(inout) :: tkns
-        integer, intent(in) :: t
+        integer, intent(in) :: t, line, col
         character(*), intent(in) :: val
         logical, optional :: internal
 
         if (tkns%size > tkns%current) then
             tkns%arr(tkns%current)%val = val
             tkns%arr(tkns%current)%t = t
+            tkns%arr(tkns%current)%line = line
+            tkns%arr(tkns%current)%col = col
             if (present(internal)) then
                 tkns%arr(tkns%current)%internal = internal
             else

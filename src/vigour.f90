@@ -16,19 +16,20 @@ contains
     subroutine say_hello
         use stdlib_ascii, only: LF
         use utils_core, only: raise_err
-        type(alloc_str_arr) :: lines
+        use tokeniser_raw_lines, only: raw_line
+        type(raw_line), dimension(:), allocatable :: lines
         type(tkn_line_arr) :: tkns
-        integer :: i
+        integer :: i, lines_count
         logical :: s, comp_success
 
         call setup()
 
-        call generate_lines(get_file_str("test.vim"), lines)
-        call tkns%alloc(lines%size)
+        call generate_lines(get_file_str("test.vim"), lines, lines_count)
+        call tkns%alloc(lines_count)
 
-        do i = 1, lines%size
-            print *, ">> '", lines%arr(i)%val, "'"
-            call gen_tkns(lines%arr(i)%val, tkns%lines(i))
+        do i = 1, lines_count
+            print *, ">> '", lines(i)%val, "'"
+            call gen_tkns(lines(i), tkns%lines(i))
             call print_tkns(tkns%lines(i))
         end do
 

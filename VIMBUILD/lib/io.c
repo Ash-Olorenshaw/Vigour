@@ -4,7 +4,7 @@
 #include "./internal.h"
 
 void raise_err(const char *msg) {
-	printf("Runtime error - %s\n", msg);
+	fprintf(stderr, "Runtime error - %s\n", msg);
 	exit(1);
 }
 
@@ -33,6 +33,7 @@ void vim_print(int count, ...) {
 		}
 	}
 
+	printf("\n");
 	va_end(argptr);
 }
 

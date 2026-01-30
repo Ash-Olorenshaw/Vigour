@@ -24,7 +24,8 @@ contains
         use stdlib_ascii, only: is_white
         use utils_strings, only: skip_whitespace, skip_to_whitespace, str_contains, replace_all_occurences
         use tokeniser_raw_tokens, only: is_special, is_valid_var_id, is_number, skip_to_tkn, is_keyword
-        character(*), intent(in) :: line
+        use tokeniser_raw_lines, only: raw_line
+        type(raw_line), intent(in) :: line
         type(tkn_line), intent(out) :: tkns
         character :: c
         integer :: i, new_i, start
@@ -43,24 +44,24 @@ contains
         ! TODO - test for string concat with '.'
         ! TODO - '+2', '-2' becomes '2', '-2', etc
 
-        do while(i <= len(line))
-            c = line(i:i)
+        do while(i <= len(line%val))
+            c = line%val(i:i)
 
             if (is_white(c)) then
-                call skip_whitespace(line, i)
+                call skip_whitespace(line%val, i)
                 start = i
                 cycle
             end if
 
-            if (i < len(line)) then
-                if (is_white(line(i+1:i+1))) then
+            if (i < len(line%val)) then
+                if (is_white(line%val(i+1:i+1))) then
                     new_tkn = .true.
-                else if (is_special(line, i + 1, new_i)) then
+                else if (is_special(line%val, i + 1, new_i)) then
                     new_tkn = .true.
                 else
                     new_tkn = .false.
                 end if
-            else if (i == len(line)) then
+            else if (i == len(line%val)) then
                 new_tkn = .true.
             else
                 new_tkn = .false.
@@ -68,54 +69,54 @@ contains
 
             if (c == '"' .or. c == "'") then
                 ! TODO - implement '' in a ' string to signify single '
-                if (i < len(line)) then
+                if (i < len(line%val)) then
                     i = i + 1
                     start = i
-                    call skip_to_tkn(line, i, c, esc=.true.)
+                    call skip_to_tkn(line%val, i, c, esc=.true.)
                     if (c == '"') then
-                        call tkns%add(STRINGVAL, line(start - 1:i))
+                        call tkns%add(STRINGVAL, line%val(start - 1:i), .false., line%real_line_no, start + line%char_offset - 1)
                     else
-                        call tkns%add(STRINGVAL, '"'//replace_all_occurences(line(start:i-1), "\", "\\")//'"')
+                        call tkns%add(STRINGVAL, '"'//replace_all_occurences(line%val(start:i-1), "\", "\\")//'"', .false., line%real_line_no, start + line%char_offset)
                     end if
                     start = i
                     cycle
                 end if
             else if (c == '(') then
                 start = i
-                call skip_to_tkn(line, i, ')')
-                call tkns%add(EXPRESSION, line(start+1:i-1))
+                call skip_to_tkn(line%val, i, ')')
+                call tkns%add(EXPRESSION, line%val(start+1:i-1), .false., line%real_line_no, start + line%char_offset + 1)
                 start = i
                 cycle
             else if (c == '[') then
                 start = i
-                call skip_to_tkn(line, i, ']')
-                call tkns%add(LISTVAL, line(start+1:i-1))
+                call skip_to_tkn(line%val, i, ']')
+                call tkns%add(LISTVAL, line%val(start+1:i-1), .false., line%real_line_no, start + line%char_offset + 1)
                 start = i
                 cycle
             else if (c == '{') then
                 start = i
-                call skip_to_tkn(line, i, '}')
-                call tkns%add(DICTVAL, line(start+1:i-1))
+                call skip_to_tkn(line%val, i, '}')
+                call tkns%add(DICTVAL, line%val(start+1:i-1), .false., line%real_line_no, start + line%char_offset + 1)
                 start = i
                 cycle
             end if
 
-            if (is_special(line, i, new_i)) then
-                call tkns%add(OPERATOR, line(i:new_i))
+            if (is_special(line%val, i, new_i)) then
+                call tkns%add(OPERATOR, line%val(i:new_i), .false., line%real_line_no, start + line%char_offset)
                 i = new_i
                 start = i + 1
-            else if (new_tkn .and. is_number(line(start:i))) then
-                if (str_contains(line(start:i), '.') > 0) then
-                    call tkns%add(FLOATVAL, line(start:i))
+            else if (new_tkn .and. is_number(line%val(start:i))) then
+                if (str_contains(line%val(start:i), '.') > 0) then
+                    call tkns%add(FLOATVAL, line%val(start:i), .false., line%real_line_no, start + line%char_offset)
                 else
-                    call tkns%add(INTVAL, line(start:i))
+                    call tkns%add(INTVAL, line%val(start:i), .false., line%real_line_no, start + line%char_offset)
                 end if
                 start = i
-            else if (new_tkn .and. is_valid_var_id(line(start:i))) then
-                if (is_keyword(line(start:i))) then
-                    call tkns%add(KEYWORD, line(start:i))
+            else if (new_tkn .and. is_valid_var_id(line%val(start:i))) then
+                if (is_keyword(line%val(start:i))) then
+                    call tkns%add(KEYWORD, line%val(start:i), .false., line%real_line_no, start + line%char_offset)
                 else
-                    call tkns%add(IDENTIFIER, line(start:i))
+                    call tkns%add(IDENTIFIER, line%val(start:i), .false., line%real_line_no, start + line%char_offset)
                 end if
                 start = i
             end if 

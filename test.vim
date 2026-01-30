@@ -1,14 +1,14 @@
 let foo = 1 + 2 * 3 * 5
-echom foo
+echo foo
 
 let bar = "foo"
 
 if bar == "foo"
-	echom bar
+	echo bar
 endif
 
 if bar != "bar"
-	echom "HAHA"
+	echo "HAHA"
 endif
 
 if bar > 1
@@ -20,5 +20,5 @@ else
 endif
 
 echo 1 + 1
-echom foo
-echom bar
+echo foo
+echo bar

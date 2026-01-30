@@ -1,4 +1,5 @@
 module resolver_identifier
+    use stdlib_strings, only: to_string
     use tokeniser_types, only: tkn_line_arr, tkn_line, EXPRESSION, &
         INTVAL, STRINGVAL, FLOATVAL, LISTVAL, DICTVAL, OPERATOR, &
         IDENTIFIER, FUNCTIONCALL, KEYWORD
@@ -15,12 +16,21 @@ contains
 
         select case(tkns%arr(1)%val)
             case("echo") 
-                resolved_tkns = resolve_tkn_line(tkns, 1)
-                call echo(resolved_tkns)
+                if (tkns%current > 2) then
+                    print *, "CALLING ECHO WITH ", tkns%current, "NUM"
+                    resolved_tkns = resolve_tkn_line(tkns, 1)
+                    call echo(resolved_tkns)
+                else
+                    call raise_err("Not enough arguments passed to proc 'echo'", tkns%arr(1)%line, tkns%arr(1)%col)
+                end if
             case("echom")
-                resolved_tkns = resolve_tkn_line(tkns, 1)
-                call echo(resolved_tkns)
-                s = write_str("printf(""\n"");")
+                ! TODO - store this for future
+                if (tkns%current > 2) then
+                    resolved_tkns = resolve_tkn_line(tkns, 1)
+                    call echo(resolved_tkns)
+                else
+                    call raise_err("Not enough arguments passed to proc 'echom'", tkns%arr(1)%line, tkns%arr(1)%col)
+                end if
         end select
     end subroutine
 

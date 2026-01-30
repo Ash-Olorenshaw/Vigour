@@ -30,7 +30,7 @@ contains
                     do i = 1, resolved_tkns%current
                         print *, resolved_tkns%arr(i)%val
                     end do
-                    call raise_err("Passed too many values into var assignment statement")
+                    call raise_err("Passed too many values into var assignment statement", tkns%arr(1)%line, tkns%arr(1)%col)
                 end if
 
                 var_name = get_var_name(tkns%arr(2)%val, scope=scope)

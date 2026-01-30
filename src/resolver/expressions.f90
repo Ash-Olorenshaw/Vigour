@@ -82,6 +82,7 @@ contains
 
     function resolve_tkn_val(tgt_tkn) result(val) 
         use resolver_globals, only: var_exists, get_var_name
+        use stdlib_strings, only: to_string
         use tokeniser_types, only: IDENTIFIER, KEYWORD, OPERATOR
         use utils_core, only: raise_err
         type(tkn), intent(in) :: tgt_tkn
@@ -91,7 +92,7 @@ contains
         print *, "RESOLVING TKN VAL..."
 
         if (tgt_tkn%t == OPERATOR .or. tgt_tkn%t == KEYWORD) then
-            call raise_err("Orphaned operator: '"//tgt_tkn%val//"'")
+            call raise_err("Orphaned operator: '"//tgt_tkn%val//"'", tgt_tkn%line, tgt_tkn%col)
         else if (tgt_tkn%internal) then
             print *, "INTERNAL: ", tgt_tkn%val
             val = tgt_tkn%val
@@ -101,7 +102,7 @@ contains
             if (var_exists(val, scope)) then
                 return
             else
-                call raise_err("Could not find referenced var: '"//tgt_tkn%val//"'")
+                call raise_err("Could not find referenced var: '"//tgt_tkn%val//"'", tgt_tkn%line, tgt_tkn%col)
             end if
         else
             print *, "ITEM1 NOT INTERNAL: ", tgt_tkn%to_str()
@@ -151,12 +152,12 @@ contains
                                     print *, "LVL 6: ", last_tkns%arr(pos)%val
                                     if (last_tkns%arr(pos)%val == "*") then
                                         if (.not. identifier_matches(prev_tkn, next_tkn, [FLOATVAL, STRINGVAL, INTVAL])) &
-                                            call raise_err("Incorrect types for '*' operation")
+                                            call raise_err("Incorrect types for '*' operation", last_tkns%arr(pos)%line, last_tkns%arr(pos)%col)
                                         new_tkn_val = "vim_mult("//item1//","//item2//")"
                                         generated_new_tkn = .true.
                                     else if (last_tkns%arr(pos)%val == "/") then
                                         if (.not. identifier_matches(prev_tkn, next_tkn, [FLOATVAL, STRINGVAL, INTVAL])) &
-                                            call raise_err("Incorrect types for '/' operation")
+                                            call raise_err("Incorrect types for '/' operation", last_tkns%arr(pos)%line, last_tkns%arr(pos)%col)
                                         new_tkn_val = "vim_div("//item1//","//item2//")"
                                         generated_new_tkn = .true.
                                     end if
@@ -164,12 +165,12 @@ contains
                                     print *, "LVL 5: ", last_tkns%arr(pos)%val
                                         if (last_tkns%arr(pos)%val == "+") then
                                             if (.not. identifier_matches(prev_tkn, next_tkn, [FLOATVAL, STRINGVAL, INTVAL])) &
-                                                call raise_err("Incorrect types for '+' operation")
+                                                call raise_err("Incorrect types for '+' operation", last_tkns%arr(pos)%line, last_tkns%arr(pos)%col)
                                             new_tkn_val = "vim_add("//item1//","//item2//")"
                                             generated_new_tkn = .true.
                                         else if (last_tkns%arr(pos)%val == "-") then
                                             if (.not. identifier_matches(prev_tkn, next_tkn, [FLOATVAL, STRINGVAL, INTVAL])) &
-                                                call raise_err("Incorrect types for '-' operation")
+                                                call raise_err("Incorrect types for '-' operation", last_tkns%arr(pos)%line, last_tkns%arr(pos)%col)
                                             new_tkn_val = "vim_sub("//item1//","//item2//")"
                                             generated_new_tkn = .true.
                                         end if
@@ -185,22 +186,22 @@ contains
                                         print *, "int vs int (float or string)"
                                         if (last_tkns%arr(pos)%val == "<") then
                                             if (.not. identifier_matches(prev_tkn, next_tkn, [FLOATVAL, STRINGVAL, INTVAL])) &
-                                                call raise_err("Incorrect types for '<' comparison")
+                                                call raise_err("Incorrect types for '<' comparison", last_tkns%arr(pos)%line, last_tkns%arr(pos)%col)
                                             new_tkn_val = "vim_lt("//item1//","//item2//",CASE_SENSITIVE)"
                                             generated_new_tkn = .true.
                                         else if (last_tkns%arr(pos)%val == ">") then
                                             if (.not. identifier_matches(prev_tkn, next_tkn, [FLOATVAL, STRINGVAL, INTVAL])) &
-                                                call raise_err("Incorrect types for '>' comparison")
+                                                call raise_err("Incorrect types for '>' comparison", last_tkns%arr(pos)%line, last_tkns%arr(pos)%col)
                                             new_tkn_val = "vim_gt("//item1//","//item2//",CASE_SENSITIVE)"
                                             generated_new_tkn = .true.
                                         else if (last_tkns%arr(pos)%val == ">=") then
                                             if (.not. identifier_matches(prev_tkn, next_tkn, [FLOATVAL, STRINGVAL, INTVAL])) &
-                                                call raise_err("Incorrect types for '>=' comparison")
+                                                call raise_err("Incorrect types for '>=' comparison", last_tkns%arr(pos)%line, last_tkns%arr(pos)%col)
                                             new_tkn_val = "vim_ge("//item1//","//item2//",CASE_SENSITIVE)"
                                             generated_new_tkn = .true.
                                         else if (last_tkns%arr(pos)%val == "<=") then
                                             if (.not. identifier_matches(prev_tkn, next_tkn, [FLOATVAL, STRINGVAL, INTVAL])) &
-                                                call raise_err("Incorrect types for '<=' comparison")
+                                                call raise_err("Incorrect types for '<=' comparison", last_tkns%arr(pos)%line, last_tkns%arr(pos)%col)
                                             new_tkn_val = "vim_le("//item1//","//item2//",CASE_SENSITIVE)"
                                             generated_new_tkn = .true.
                                         end if
@@ -209,7 +210,7 @@ contains
                             end if
 
                             if (generated_new_tkn) then
-                                call new_tkns%add(prev_tkn%t, new_tkn_val)
+                                call new_tkns%add(prev_tkn%t, new_tkn_val, line=prev_tkn%line, col=prev_tkn%col)
                                 new_tkns%arr(new_tkns%current-1)%internal = .true.
                                 call consume_group(consumed, next_consumed, pos-1, pos, pos+1)
                                 print *, "ADDING: ", new_tkns%arr(new_tkns%current-1)%val
@@ -219,7 +220,7 @@ contains
                             end if
                         end if
                         if (.not. is_consumed(pos - 1, consumed, next_consumed)) then
-                            call new_tkns%add(prev_tkn%t, prev_tkn%val, prev_tkn%internal)
+                            call new_tkns%add(prev_tkn%t, prev_tkn%val, prev_tkn%internal, prev_tkn%line, prev_tkn%col)
                         end if
                     end if
                 end if
@@ -240,7 +241,7 @@ contains
                         end if
                     end if
                     print *, "ADDING TKN: ", new_tkn_val
-                    call new_tkns%add(last_tkns%arr(pos)%t, new_tkn_val, new_tkn_internal)
+                    call new_tkns%add(last_tkns%arr(pos)%t, new_tkn_val, new_tkn_internal, prev_tkn%line, prev_tkn%col)
                     call consume(consumed, next_consumed, pos)
                 end if
 

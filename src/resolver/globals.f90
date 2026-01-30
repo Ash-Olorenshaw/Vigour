@@ -10,7 +10,7 @@ module resolver_globals
     end type
 
     type(var), public :: VARS(1024)
-    type(var), allocatable, public :: FUNCTIONS(:)
+    type(var), public :: FUNCTIONS(1024)
     integer, public :: VARS_SIZE = 0
     integer, public :: FUNCTIONS_SIZE = 0
 
